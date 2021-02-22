@@ -1,26 +1,78 @@
-# CDCgov GitHub Organization Open Source Project Template
-
-**Template for clearance: This project serves as a template to aid projects in starting up and moving through clearance procedures. To start, create a new repository and implement the required [open practices](open_practices.md), train on and agree to adhere to the organization's [rules of behavior](rules_of_behavior.md), and [send a request through the create repo form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) using language from this template as a Guide.**
-
-**General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm).  GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise. 
-
-## Access Request, Repo Creation Request
-
-* [CDC GitHub Open Project Request Form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) _[Requires a CDC Office365 login, if you do not have a CDC Office365 please ask a friend who does to submit the request on your behalf. If you're looking for access to the CDCEnt private organization, please use the [GitHub Enterprise Cloud Access Request form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUQjVJVDlKS1c0SlhQSUxLNVBaOEZCNUczVS4u).]_
-
-## Related documents
-
-* [Open Practices](open_practices.md)
-* [Rules of Behavior](rules_of_behavior.md)
-* [Thanks and Acknowledgements](thanks.md)
-* [Disclaimer](DISCLAIMER.md)
-* [Contribution Notice](CONTRIBUTING.md)
-* [Code of Conduct](code-of-conduct.md)
+# MycoSNP GeneFlow Workflows: BWA Reference
 
 ## Overview
 
-Describe the purpose of your project. Add additional sections as necessary to help collaborators and potential collaborators understand and use your project.
-  
+The MycoSNP GeneFlow workflows includes the following set three workflows:
+
+1. MycoSNP BWA Reference: Prepares a reference FASTA file for BWA alignment and GATK variant calling by masking repeats in the reference and generating the BWA index.
+2. MycoSNP BWA Pre-Process: Prepares samples (paired-end FASTQ files) for GATK variant calling by aligning the samples to a BWA reference index and ensuring that the BAM files are correctly formatted.
+3. MycoSNP GATK Variants: Calls variants and generates a multi-FASTA file. 
+
+This repository contains the MycoSNP BWA Reference workflow, which consists of three steps:
+
+1. Mask repeats in a reference FASTA file using MUMmer 3.23 and BEDTools 2.29.2.
+2. Creates a FASTA index (.fai) and dictionary (.dict) using SAMTools 1.10 and Picard 2.22.9, repectively.
+3. Creates a BWA index using BWA 0.7.17.
+
+View the workflow parameter requirements using GeneFlow's `help` command:
+
+```
+gf help mycosnp-bwa-reference/0.9
+```
+
+Execute the workflow with a command similar to:
+
+```
+gf --log-level debug run mycosnp-bwa-reference/0.9 \
+    -o ./output \
+    -n test-mycosnp-bwa-reference \
+    --in.reference_sequence /scicomp/reference/mdb-references/candida-auris_clade-i_B8441_GCA_002759435.2.fasta \
+    --ec default:gridengine \
+    --ep \
+        default.slots:4 \
+        'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='
+```
+
+Arguments are explained below:
+
+1. `-o ./output`: The workflow's output will be placed in the `./output` folder. This folder will be created if it doesn't already exist. 
+2. `-n test-mycosnp-bwa-reference`: This is the name of the workflow job. A sub-folder with the name `test-mycosnp-bwa-reference` will be created in `./output` for the workflow output. 
+3. `--in.reference_sequence`: This is the reference FASTA file to be processed and indexed by the workflow.
+4. `--ec default:gridengine`: This is the workflow "execution context", which specifies where the workflow will be executed. "gridengine" is recommended, as this will execute the workflow on the HPC. However, "local" may also be used. 
+5. `--ep`: This specifies one or more workflow "execution parameters".
+   a. `default.slots:4`: This specifies the number of CPUs or "slots" to request from the gridengine HPC when executing the workflow.
+   b. `'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='`: This specifies a number of commands to execute on each HPC node to prepare that node for execution. These commands ensure that a local "tmp" directory is used (rather than /tmp), and also resets an environment variable that may interfere with correct execution of singularity containers.
+   c. `'default.other:-l avx -v PATH'`: This specifies that only "avx" capable nodes should be used to execute the workflow apps, and also that the user's PATH environment variable is passed to the HPC job environment. 
+
+After successful execution, the output directory should contain the following structure:
+
+```
+├── bwa_index
+│   ├── bwa_index
+│   │   ├── bwa_index.amb
+│   │   ├── bwa_index.ann
+│   │   ├── bwa_index.bwt
+│   │   ├── bwa_index.pac
+│   │   └── bwa_index.sa
+│   └── _log
+│       ├── bwa_index-bwa-index.stderr
+│       ├── bwa_index-bwa-index.stdout
+│       ├── gf-0-bwa_index-bwa_index.err
+│       └── gf-0-bwa_index-bwa_index.out
+└── index_reference
+    ├── indexed_reference
+    │   ├── indexed_reference.dict
+    │   ├── indexed_reference.fasta
+    │   └── indexed_reference.fasta.fai
+    └── _log
+        ├── gf-0-index_reference-indexed_reference.err
+        ├── gf-0-index_reference-indexed_reference.out
+        ├── indexed_reference-picard-createsequencedictionary.stderr
+        ├── indexed_reference-picard-createsequencedictionary.stdout
+        ├── indexed_reference-samtools-faidx.stderr
+        └── indexed_reference-samtools-faidx.stdout
+```
+
 ## Public Domain Standard Notice
 This repository constitutes a work of the United States Government and is not
 subject to domestic copyright protection under 17 USC § 105. This repository is in

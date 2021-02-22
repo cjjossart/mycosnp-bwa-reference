@@ -1,0 +1,62 @@
+%YAML 1.1
+---
+gfVersion: v2.0
+class: workflow
+
+name: MycoSNP BWA Reference
+description: Prepare a BWA reference index for the MycoSNP workflow.
+version: '0.9'
+git: https://git.biotech.cdc.gov/geneflow-workflows/mycosnp-bwa-reference.git
+
+inputs:
+  reference_sequence:
+    label: Reference Sequence
+    description: Reference sequence FASTA file
+    type: File
+    default: /reference/sequence
+    enable: true
+    visible: true
+
+parameters:
+
+final_output:
+- index_reference
+- bwa_index
+
+apps:
+  mask-repeats:
+    git: https://gitlab.com/geneflow/apps/mask-repeats-gf2.git
+    version: '0.1'
+
+  bwa-index:
+    git: https://gitlab.com/geneflow/apps/bwa-index-gf2.git
+    version: '0.7.17-03'
+
+  index-reference:
+    git: https://gitlab.com/geneflow/apps/index-reference-gf2.git
+    version: '0.1'
+
+steps:
+  mask_repeats:
+    app: mask-repeats
+    depend: []
+    template:
+      reference_sequence: ${workflow->reference_sequence}
+      output: masked_reference
+
+  index_reference:
+    app: index-reference
+    depend:
+    - mask_repeats
+    template:
+      reference_sequence: ${mask_repeats->output}/masked_reference/masked_reference.fasta
+      output: indexed_reference
+
+  bwa_index:
+    app: bwa-index
+    depend:
+    - index_reference
+    template:
+      reference: ${index_reference->output}/indexed_reference/indexed_reference.fasta
+      output: bwa_index
+...
