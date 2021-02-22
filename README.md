@@ -4,7 +4,7 @@
 
 MycoSNP includes the following set of three GeneFlow workflows:
 
-1. MycoSNP BWA Reference: Prepares a reference FASTA file for BWA alignment and GATK variant calling by masking repeats in the reference and generating the BWA index.
+1. MycoSNP BWA Reference v0.9: Prepares a reference FASTA file for BWA alignment and GATK variant calling by masking repeats in the reference and generating the BWA index.
 2. MycoSNP BWA Pre-Process: Prepares samples (paired-end FASTQ files) for GATK variant calling by aligning the samples to a BWA reference index and ensuring that the BAM files are correctly formatted.
 3. MycoSNP GATK Variants: Calls variants and generates a multi-FASTA file. 
 
@@ -56,7 +56,7 @@ First install GeneFlow and its dependencies as follows:
     pip3 install drmaa
     ```
 
-4. Clone and install the GeneFlow workflow.
+4. Clone and install the mycosnp-bwa-reference workflow.
 
     ```bash
     cd ~/mycosnp
@@ -80,8 +80,23 @@ Execute the workflow with a command similar to:
 gf --log-level debug run mycosnp-bwa-reference \
     -o ./output \
     -n test-mycosnp-bwa-reference \
+    --in.reference_sequence /scicomp/reference/mdb-references/candida-auris_clade-i_B8441_GCA_002759435.2.fasta
+```
+
+Alternatively, to execute the workflow on an HPC system, you must first set the DRMAA library path environment variable. For example:
+
+```
+export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx-amd64/libdrmaa2.so
+```
+
+Note that the DRMAA library for your specific scheduler (either UGE/SGE or SLURM) must be installed, and the installed library path may be different in your environment. Once the environment has been configured, execute the workflow as follows:
+
+```
+gf --log-level debug run mycosnp-bwa-reference \
+    -o ./output \
+    -n test-mycosnp-bwa-reference \
     --in.reference_sequence /scicomp/reference/mdb-references/candida-auris_clade-i_B8441_GCA_002759435.2.fasta \
-    --ec default:gridengine \
+    --ec default:slurm \
     --ep \
         default.slots:4 \
         'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='
@@ -96,7 +111,6 @@ Arguments are explained below:
 5. `--ep`: This specifies one or more workflow "execution parameters".
    a. `default.slots:4`: This specifies the number of CPUs or "slots" to request from the gridengine HPC when executing the workflow.
    b. `'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='`: This specifies a number of commands to execute on each HPC node to prepare that node for execution. These commands ensure that a local "tmp" directory is used (rather than /tmp), and also resets an environment variable that may interfere with correct execution of singularity containers.
-   c. `'default.other:-l avx -v PATH'`: This specifies that only "avx" capable nodes should be used to execute the workflow apps, and also that the user's PATH environment variable is passed to the HPC job environment. 
 
 After successful execution, the output directory should contain the following structure:
 
