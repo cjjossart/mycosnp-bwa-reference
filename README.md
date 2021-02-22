@@ -2,7 +2,7 @@
 
 ## Overview
 
-The MycoSNP GeneFlow workflows includes the following set three workflows:
+MycoSNP includes the following set of three GeneFlow workflows:
 
 1. MycoSNP BWA Reference: Prepares a reference FASTA file for BWA alignment and GATK variant calling by masking repeats in the reference and generating the BWA index.
 2. MycoSNP BWA Pre-Process: Prepares samples (paired-end FASTQ files) for GATK variant calling by aligning the samples to a BWA reference index and ensuring that the BAM files are correctly formatted.
@@ -14,16 +14,70 @@ This repository contains the MycoSNP BWA Reference workflow, which consists of t
 2. Creates a FASTA index (.fai) and dictionary (.dict) using SAMTools 1.10 and Picard 2.22.9, repectively.
 3. Creates a BWA index using BWA 0.7.17.
 
+## Requirements
+
+To run the workflow, please ensure that your computing environment meets the following requirements:
+
+1. Linux Operating System
+
+2. Git
+
+3. SquashFS, required for executing Singularity containers - Most standard Linux distributions have SquashFS installed and enabled by default. However, in the event that SquashFS is not enabled, we recommend that you check with your system administrator to install it. Alternatively, you can enable it by following these instructions (warning: these docs are for advanced users): https://www.tldp.org/HOWTO/html_single/SquashFS-HOWTO/
+
+4. Python 3+
+
+5. Singularity
+
+6. GeneFlow (install instructions below)
+
+7. DRMAA library, required for executing the workflow in an HPC environment
+
+## Installation
+
+First install GeneFlow and its dependencies as follows:
+
+1. Create a Python virtual environment to install dependencies and activate that environment.
+
+    ```bash
+    mkdir -p ~/mycosnp
+    cd ~/mycosnp
+    python3 -m venv ~/mycosnp/gfpy
+    source ~/mycosnp/gfpy/bin/activate
+    ```
+2. Install GeneFlow.
+
+    ```bash
+    pip3 install geneflow
+    ```
+
+3. Install the Python DRMAA library if you need to execute the workflow in an HPC environment. Skip this step if you do not need HPC.
+
+    ```bash
+    pip3 install drmaa
+    ```
+
+4. Clone and install the GeneFlow workflow.
+
+    ```bash
+    cd ~/mycosnp
+    gf install-workflow --make-apps -g https://github.com/CDCgov/mycosnp-bwa-reference mycosnp-bwa-reference
+    ```
+
+    The workflow should now be installed in the `~/mycosnp/mycosnp-bwa-reference` directory.
+
+## Execution
+
 View the workflow parameter requirements using GeneFlow's `help` command:
 
 ```
-gf help mycosnp-bwa-reference/0.9
+cd ~/mycosnp
+gf help mycosnp-bwa-reference
 ```
 
 Execute the workflow with a command similar to:
 
 ```
-gf --log-level debug run mycosnp-bwa-reference/0.9 \
+gf --log-level debug run mycosnp-bwa-reference \
     -o ./output \
     -n test-mycosnp-bwa-reference \
     --in.reference_sequence /scicomp/reference/mdb-references/candida-auris_clade-i_B8441_GCA_002759435.2.fasta \
