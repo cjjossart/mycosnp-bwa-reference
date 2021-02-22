@@ -1,4 +1,4 @@
-# MycoSNP GeneFlow Workflows: BWA Reference
+# MycoSNP: BWA Reference
 
 ## Overview
 
@@ -28,7 +28,7 @@ To run the workflow, please ensure that your computing environment meets the fol
 
 5. Singularity
 
-6. GeneFlow (install instructions below)
+6. GeneFlow (https://github.com/CDCgov/geneflow2, install instructions below)
 
 7. DRMAA library, required for executing the workflow in an HPC environment
 
