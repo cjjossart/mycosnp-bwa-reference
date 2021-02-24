@@ -73,7 +73,7 @@ Arguments are explained below:
 1. `-o ./output`: The workflow's output will be placed in the `./output` folder. This folder will be created if it doesn't already exist. 
 2. `-n test-mycosnp-bwa-reference`: This is the name of the workflow job. A sub-folder with the name `test-mycosnp-bwa-reference` will be created in `./output` for the workflow output. 
 3. `--in.reference_sequence`: This is the reference FASTA file to be processed and indexed by the workflow.
-4. `--ec default:gridengine`: This is the workflow "execution context", which specifies where the workflow will be executed. "gridengine" is recommended, as this will execute the workflow on the HPC. However, "local" may also be used. 
+4. `--ec default:slurm`: This is the workflow "execution context", which specifies where the workflow will be executed. "gridengine" or "slurm" is recommended, as this will execute the workflow on the HPC. However, "local" may also be used. 
 5. `--ep`: This specifies one or more workflow "execution parameters".
    a. `default.slots:4`: This specifies the number of CPUs or "slots" to request from the gridengine HPC when executing the workflow.
    b. `'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='`: This specifies a number of commands to execute on each HPC node to prepare that node for execution. These commands ensure that a local "tmp" directory is used (rather than /tmp), and also resets an environment variable that may interfere with correct execution of singularity containers.
