@@ -16,50 +16,22 @@ This repository contains the MycoSNP BWA Reference workflow, which consists of t
 
 ## Requirements
 
-To run the workflow, please ensure that your computing environment meets the following requirements:
-
-1. Linux Operating System
-
-2. Git
-
-3. SquashFS, required for executing Singularity containers - Most standard Linux distributions have SquashFS installed and enabled by default. However, in the event that SquashFS is not enabled, we recommend that you check with your system administrator to install it. Alternatively, you can enable it by following these instructions (warning: these docs are for advanced users): https://www.tldp.org/HOWTO/html_single/SquashFS-HOWTO/
-
-4. Python 3+
-
-5. Singularity
-
-6. GeneFlow (https://github.com/CDCgov/geneflow2, install instructions below)
-
-7. DRMAA library, required for executing the workflow in an HPC environment
+Before installing and running this workflow, follow the instructions in the main repository to install the requirements: https://github.com/CDCgov/mycosnp
 
 ## Installation
 
 First install GeneFlow and its dependencies as follows:
 
-1. Create a Python virtual environment to install dependencies and activate that environment.
-
-    ```bash
-    mkdir -p ~/mycosnp
-    cd ~/mycosnp
-    python3 -m venv ~/mycosnp/gfpy
-    source ~/mycosnp/gfpy/bin/activate
-    ```
-2. Install GeneFlow.
-
-    ```bash
-    pip3 install geneflow
-    ```
-
-3. Install the Python DRMAA library if you need to execute the workflow in an HPC environment. Skip this step if you do not need HPC.
-
-    ```bash
-    pip3 install drmaa
-    ```
-
-4. Clone and install the mycosnp-bwa-reference workflow.
+1. Activate the [previously installed](https://github.com/CDCgov/mycosnp) Python virtual environment.
 
     ```bash
     cd ~/mycosnp
+    source gfpy/bin/activate
+    ```
+
+2. Clone and install the mycosnp-bwa-reference workflow.
+
+    ```bash
     gf install-workflow --make-apps -g https://github.com/CDCgov/mycosnp-bwa-reference mycosnp-bwa-reference
     ```
 
@@ -74,13 +46,13 @@ cd ~/mycosnp
 gf help mycosnp-bwa-reference
 ```
 
-Execute the workflow with a command similar to:
+Execute the workflow with a command similar to the following. Be sure to replace the `/path/to/reference/..` with your reference sequence:
 
 ```
 gf --log-level debug run mycosnp-bwa-reference \
     -o ./output \
     -n test-mycosnp-bwa-reference \
-    --in.reference_sequence /scicomp/reference/mdb-references/candida-auris_clade-i_B8441_GCA_002759435.2.fasta
+    --in.reference_sequence /path/to/reference/candida-auris_clade-i_B8441_GCA_002759435.2.fasta
 ```
 
 Alternatively, to execute the workflow on an HPC system, you must first set the DRMAA library path environment variable. For example:
@@ -95,7 +67,7 @@ Note that the DRMAA library for your specific scheduler (either UGE/SGE or SLURM
 gf --log-level debug run mycosnp-bwa-reference \
     -o ./output \
     -n test-mycosnp-bwa-reference \
-    --in.reference_sequence /scicomp/reference/mdb-references/candida-auris_clade-i_B8441_GCA_002759435.2.fasta \
+    --in.reference_sequence /path/to/reference/candida-auris_clade-i_B8441_GCA_002759435.2.fasta \
     --ec default:slurm \
     --ep \
         default.slots:4 \
