@@ -18,6 +18,13 @@ inputs:
     visible: true
 
 parameters:
+  threads:
+    label: CPU Threads
+    description: Number of CPU threads for masking repeats
+    type: int
+    default: 2
+    enable: true
+    visible: true
 
 final_output:
 - index_reference
@@ -42,6 +49,7 @@ steps:
     depend: []
     template:
       reference_sequence: ${workflow->reference_sequence}
+      threads: ${workflow->threads}
       output: masked_reference
 
   index_reference:

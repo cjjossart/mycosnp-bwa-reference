@@ -4,7 +4,7 @@
 
 This repository contains the MycoSNP BWA Reference workflow, which consists of three steps:
 
-1. Mask repeats in a reference FASTA file using MUMmer 3.23 and BEDTools 2.29.2.
+1. Mask repeats in a reference FASTA file using MUMmer 4.0 and BEDTools 2.29.2.
 2. Creates a FASTA index (.fai) and dictionary (.dict) using SAMTools 1.10 and Picard 2.22.9, repectively.
 3. Creates a BWA index using BWA 0.7.17.
 
@@ -46,7 +46,8 @@ Execute the workflow with a command similar to the following. Be sure to replace
 gf --log-level debug run mycosnp-bwa-reference \
     -o ./output \
     -n test-mycosnp-bwa-reference \
-    --in.reference_sequence /path/to/reference/candida-auris_clade-i_B8441_GCA_002759435.2.fasta
+    --in.reference_sequence /path/to/reference/candida-auris_clade-i_B8441_GCA_002759435.2.fasta \
+    --param.threads 4
 ```
 
 Alternatively, to execute the workflow on an HPC system, you must first set the DRMAA library path environment variable. For example:
@@ -62,6 +63,7 @@ gf --log-level debug run mycosnp-bwa-reference \
     -o ./output \
     -n test-mycosnp-bwa-reference \
     --in.reference_sequence /path/to/reference/candida-auris_clade-i_B8441_GCA_002759435.2.fasta \
+    --param.threads 4 \
     --ec default:slurm \
     --ep \
         default.slots:4 \
@@ -73,8 +75,9 @@ Arguments are explained below:
 1. `-o ./output`: The workflow's output will be placed in the `./output` folder. This folder will be created if it doesn't already exist. 
 2. `-n test-mycosnp-bwa-reference`: This is the name of the workflow job. A sub-folder with the name `test-mycosnp-bwa-reference` will be created in `./output` for the workflow output. 
 3. `--in.reference_sequence`: This is the reference FASTA file to be processed and indexed by the workflow.
-4. `--ec default:slurm`: This is the workflow "execution context", which specifies where the workflow will be executed. "gridengine" or "slurm" is recommended, as this will execute the workflow on the HPC. However, "local" may also be used. 
-5. `--ep`: This specifies one or more workflow "execution parameters".
+4. `--param.threads`: This is the number of CPU threads to use for repeat masking.
+5. `--ec default:slurm`: This is the workflow "execution context", which specifies where the workflow will be executed. "gridengine" or "slurm" is recommended, as this will execute the workflow on the HPC. However, "local" may also be used. 
+6. `--ep`: This specifies one or more workflow "execution parameters".
    a. `default.slots:4`: This specifies the number of CPUs or "slots" to request from the gridengine HPC when executing the workflow.
    b. `'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='`: This specifies a number of commands to execute on each HPC node to prepare that node for execution. These commands ensure that a local "tmp" directory is used (rather than /tmp), and also resets an environment variable that may interfere with correct execution of singularity containers.
 
