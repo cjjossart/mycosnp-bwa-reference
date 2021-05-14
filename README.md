@@ -67,7 +67,7 @@ gf --log-level debug run mycosnp-bwa-reference \
     --ec default:slurm \
     --ep \
         default.slots:4 \
-        'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='
+        'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export PATH=/usr/sbin:$PATH && export XDG_RUNTIME_DIR='
 ```
 
 Arguments are explained below:
