@@ -33,15 +33,15 @@ final_output:
 apps:
   mask-repeats:
     git: https://gitlab.com/cjjossart/mask-repeats-gf2.git
-    version: '0.2'
+    version: '0.3'
 
   bwa-index:
     git: https://gitlab.com/cjjossart/bwa-index-gf2.git
-    version: '0.7.17-03'
+    version: '0.8'
 
   index-reference:
     git: https://gitlab.com/cjjossart/index-reference-gf2.git
-    version: '0.1'
+    version: '0.2'
 
 steps:
   mask_repeats:
