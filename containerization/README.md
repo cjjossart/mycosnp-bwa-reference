@@ -17,4 +17,5 @@ Once all the tools are downloaded and the workflows have been updated, the Mycos
 The next step is to build a dockerfile that will build this environment in a docker container.
 
 ## Dockerfile build
-The dockerfile consists of multiple stages and uses geneflows image as a base.
+The dockerfile consists of multiple stages that downloads all 5 of the necessary tools and their dependendencies.
+I have successfully created an image that has all tools and dependences at the moment and just need to integrate geneflow into the build.
