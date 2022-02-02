@@ -5,7 +5,7 @@ class: workflow
 
 name: MycoSNP BWA Reference
 description: Prepare a BWA reference index for the MycoSNP workflow.
-version: '0.22'
+version: '0.21'
 git: https://github.com/cjjossart/mycosnp-bwa-reference.git
 
 inputs:
