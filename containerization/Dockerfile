@@ -79,8 +79,9 @@ RUN cd &&\
 FROM geneflow2:2.6.0
 
 
-RUN git clone https://github.com/cjjossart/mycosnp-bwa-reference.git &&\
-    gf install-workflow --make-apps v0.22 -f -g https://github.com/cjjossart/mycosnp-bwa-reference workflows/mycosnp-bwa-reference/0.22 &&\
+RUN git clone https://github.com/CDCgov/mycosnp.git &&\
+    cd mycosnp &&\
+    gf install-workflow --make-apps v0.22 -f -g https://github.com/cjjossart/mycosnp-bwa-reference workflows/mycosnp-bwa-reference/0.22
 
 
 WORKDIR /data
